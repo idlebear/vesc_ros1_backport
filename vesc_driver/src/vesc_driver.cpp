@@ -198,8 +198,13 @@ void VescDriver::vescPacketCallback(const std::shared_ptr<VescPacket const>& pac
 
     vesc_msgs::VescImuStamped::Ptr imu_msg(new vesc_msgs::VescImuStamped);
     sensor_msgs::ImuPtr std_imu_msg(new sensor_msgs::Imu);
-    imu_msg->header.stamp = ros::Time::now();
-    std_imu_msg->header.stamp = ros::Time::now();
+    auto now = ros::Time::now();
+    imu_msg->header.stamp = now;
+    std_imu_msg->header.stamp = now;
+
+    // TODO: make the imu frame identifier a configurable option
+    imu_msg->header.frame_id = "base_link";
+    std_imu_msg->header.frame_id = "base_link";
 
     imu_msg->imu.ypr.x = imuData->roll();
     imu_msg->imu.ypr.y = imuData->pitch();
