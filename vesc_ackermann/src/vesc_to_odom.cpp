@@ -107,7 +107,7 @@ void VescToOdom::vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& 
   // calc elapsed time
   ros::Duration dt = state->header.stamp - last_state_->header.stamp;
 
-  /** @todo could probably do better propigating odometry, e.g. trapezoidal integration */
+  /** @todo could probably do better propagating odometry, e.g. trapezoidal integration */
 
   // propigate odometry
   double x_dot = current_speed * cos(yaw_);
@@ -138,6 +138,10 @@ void VescToOdom::vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& 
   /** @todo Think about position uncertainty, perhaps get from parameters? */
   odom->pose.covariance[0]  = 0.2;  ///< x
   odom->pose.covariance[7]  = 0.2;  ///< y
+  /** @todo Other positions have huge uncertainty -- or very little as they aren't measured, but EKF doesn't like zeros */
+  odom->pose.covariance[14] = 500;  ///< z
+  odom->pose.covariance[21] = 500;  ///< roll
+  odom->pose.covariance[28] = 500;  ///< pitch
   odom->pose.covariance[35] = 0.4;  ///< yaw
 
   // Velocity ("in the coordinate frame given by the child_frame_id")
@@ -147,6 +151,13 @@ void VescToOdom::vescStateCallback(const vesc_msgs::VescStateStamped::ConstPtr& 
 
   // Velocity uncertainty
   /** @todo Think about velocity uncertainty */
+  // BUGBUG -- comment these out for now -- may not be required for a quiet ekf
+  //  odom->twist.covariance[0]  = 1;  ///< dx
+  //  odom->twist.covariance[7]  = 1;  ///< dy
+  //  odom->twist.covariance[14] = 500;  ///< dz
+  //  odom->twist.covariance[21] = 500;  ///< d_roll
+  //  odom->twist.covariance[28] = 500;  ///< d_pitch
+  //  odom->twist.covariance[35] = 1;  ///< d_yaw
 
   if (publish_tf_)
   {
