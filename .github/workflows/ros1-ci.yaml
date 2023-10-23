@@ -1,6 +1,7 @@
 name: ROS1 CI Workflow
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
