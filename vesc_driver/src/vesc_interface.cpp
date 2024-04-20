@@ -151,7 +151,7 @@ void VescInterface::Impl::rxThread()
 VescInterface::VescInterface(const std::string& port,
                              const PacketHandlerFunction& packet_handler,
                              const ErrorHandlerFunction& error_handler) :
-  impl_(new Impl())
+  impl_(new Impl()), last_send_req_(0)
 {
   setPacketHandler(packet_handler);
   setErrorHandler(error_handler);
@@ -224,6 +224,8 @@ bool VescInterface::isConnected() const
 
 void VescInterface::send(const VescPacket& packet)
 {
+  std::lock_guard<std::mutex> guard(send_mutex_);
+  
   size_t written = impl_->serial_.write(packet.frame());
   if (written != packet.frame().size())
   {

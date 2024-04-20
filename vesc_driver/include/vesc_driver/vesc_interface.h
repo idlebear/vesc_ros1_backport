@@ -34,6 +34,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <mutex>
 
 #include "vesc_driver/vesc_packet.h"
 
@@ -123,6 +124,7 @@ private:
   // Pimpl - hide serial port members from class users
   class Impl;
   std::unique_ptr<Impl> impl_;
+  std::mutex send_mutex_;
 };
 
 // todo: review
